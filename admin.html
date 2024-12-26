@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмін-панель</title>
+    <style>
+        .room {
+            margin: 20px 0;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Адмін-панель</h1>
+    <div id="rooms"></div>
+    <script>
+        const roomsContainer = document.getElementById("rooms");
+
+        // Завантаження статусу квестів
+        function loadQuestStatus() {
+            fetch("/api/quest-status")
+                .then(response => response.json())
+                .then(questStatus => {
+                    roomsContainer.innerHTML = "";
+                    for (const [room, status] of Object.entries(questStatus)) {
+                        const roomDiv = document.createElement("div");
+                        roomDiv.className = "room";
+                        roomDiv.innerHTML = `
+                            <h3>${room.toUpperCase()}</h3>
+                            <button onclick="updateQuestStatus('${room}', true)">Виконано</button>
+                            <button onclick="updateQuestStatus('${room}', false)">Не виконано</button>
+                        `;
+                        roomsContainer.appendChild(roomDiv);
+                    }
+                });
+        }
+
+        // Оновлення статусу квесту
+        function updateQuestStatus(room, status) {
+            fetch("/api/quest-status")
+                .then(response => response.json())
+                .then(questStatus => {
+                    questStatus[room] = status;
+                    fetch("/api/quest-status", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(questStatus),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert(data.message);
+                            loadQuestStatus();
+                        });
+                });
+        }
+
+        // Завантажити статуси при завантаженні сторінки
+        loadQuestStatus();
+    </script>
+</body>
+</html>

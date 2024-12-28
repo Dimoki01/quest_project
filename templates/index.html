@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новий рік</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        #rooms-info, #users-info {
+            margin-top: 20px;
+        }
+
+        .room, .user {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <video id="intro-video" autoplay playsinline>
+        <source src="/static/videos/intro.mp4" type="video/mp4">
+        <div id="status">
+            Ваш браузер не підтримує відео.
+        </div>
+    </video>
+    <div id="rooms-info">
+        <h2>Кімнати</h2>
+        <div id="rooms"></div>
+    </div>
+    <div id="users-info">
+        <h2>Гравці</h2>
+        <div id="users"></div>
+    </div>
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

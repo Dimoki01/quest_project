@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмін-панель</title>
+    <style>
+        .room, .user {
+            margin: 20px 0;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #confirmation {
+            color: green;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Адмін-панель</h1>
+    <div id="rooms">
+        <h2>Кімнати</h2>
+    </div>
+    <div id="users">
+        <h2>Гравці</h2>
+    </div>
+    <div id="confirmation"></div>
+    <script>
+        const roomsContainer = document.getElementById("rooms");
+        const usersContainer = document.getElementById("users");
+        const confirmationDiv = document.getElementById("confirmation");
+
+        function loadData() {
+            fetch("/api/quest-status")
+                .then(response => response.json())
+                .then(data => {
+                    // Кімнати
+                    roomsContainer.innerHTML = "";
+                    for (const [room, status] of Object.entries(data.quests)) {
+                        const roomDiv = document.createElement("div");
+                        roomDiv.className = "room";
+                        roomDiv.innerHTML = `
+                            <h3>${room}</h3>
+                            <button onclick="updateRoomStatus('${room}', true)">Виконано</button>
+                            <button onclick="updateRoomStatus('${room}', false)">Не виконано</button>
+                        `;
+                        roomsContainer.appendChild(roomDiv);
+                    }
+
+                    // Гравці
+                    usersContainer.innerHTML = "";
+                    for (const [user, points] of Object.entries(data.users)) {
+                        const userDiv = document.createElement("div");
+                        userDiv.className = "user";
+                        userDiv.innerHTML = `
+                            <h3>${user}</h3>
+                            <p>Очки: <span>${points}</span></p>
+                            <button onclick="updateUserPoints('${user}', 1)">+1</button>
+                            <button onclick="updateUserPoints('${user}', -1)">-1</button>
+                        `;
+                        usersContainer.appendChild(userDiv);
+                    }
+                });
+        }
+
+        function updateRoomStatus(room, status) {
+            fetch("/update_room", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ room, status })
+            })
+            .then(() => {
+                confirmationDiv.textContent = `Статус кімнати "${room}" успішно оновлено!`;
+                loadData();
+            });
+        }
+
+        function updateUserPoints(user, points) {
+            fetch("/update_user_points", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user, points })
+            })
+            .then(() => {
+                confirmationDiv.textContent = `Очки для гравця "${user}" успішно оновлено!`;
+                loadData();
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
